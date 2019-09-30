@@ -45,30 +45,38 @@ router.delete('/:id', (req, res) => {
 
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
-    User.getById(id)
-    .then(user => {
-        if (user) {
-            User.update(id, {name})
-            .then(updated => {
-                res.status(200).json(updated)
-            })
-        } else {
-            res.status(400).json({error: 'user with this id could not be found'});
-        }
+    User.update(id, {name})
+        .then(() => {
+            User.getById(id)
+                .then(user => res.status(200).json(user))
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).json({error: "user with this id can not be found"})
+                })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: "error on server side"})
+        })
     })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({error: 'error with the server getting id'})
-    })
-});
+
 
 //custom middleware
 
 function validateUserId(req, res, next) {
-
+const { id } = req.params.id;
+User.getById(id)
+    .then(user => {
+        req.user = user;
+        if (user) {
+            next();
+        } else {
+            res.status(404).json({error: "user with this id does not exist"})
+        }
+    })
 };
 
 function validateUser(req, res, next) {
