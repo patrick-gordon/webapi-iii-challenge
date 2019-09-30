@@ -23,6 +23,15 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+    const { id } = req.params;
+    User.getById(id)
+    .then(user => {
+        if(user){
+            res.status(200).json(user)
+        } else {
+            res.status(400).json({error: "the user with this id could not be found"})
+        }
+    })
 
 });
 
@@ -35,6 +44,15 @@ router.delete('/:id', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    User.getById(id)
+        .then(user => {
+            if (user){
+                res.status(200).json(user)
+            } else {
+                res.status(404).json({error: " User with this ID does not exist"})
+            }
+        })
 
 });
 
