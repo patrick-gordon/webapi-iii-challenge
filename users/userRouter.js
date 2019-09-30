@@ -48,26 +48,28 @@ router.delete('/:id', (req, res) => {
 router.put('/:id', validateUserId, (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
-    User.update(id, {name})
-        .then(() => {
-            User.getById(id)
+        User.update(id, {name})
+        .then(updated => {
+            if(updated) {
+                User.getById(id)
                 .then(user => res.status(200).json(user))
                 .catch(err => {
                     console.log(err)
-                    res.status(500).json({error: "user with this id can not be found"})
-                })
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({error: "error on server side"})
-        })
+                    res.status(500).json({error: "error getting user"})
+                });
+            }
     })
+   .catch(err => {
+       console.log(err)
+       res.status(500).json({error: " Error getting updated user"});
+   });
+});
 
 
 //custom middleware
 
 function validateUserId(req, res, next) {
-const { id } = req.params.id;
+const { id } = req.params;
 User.getById(id)
     .then(user => {
         req.user = user;
@@ -75,8 +77,8 @@ User.getById(id)
             next();
         } else {
             res.status(404).json({error: "user with this id does not exist"})
-        }
-    })
+        };
+    });
 };
 
 function validateUser(req, res, next) {
