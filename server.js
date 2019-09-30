@@ -8,7 +8,7 @@ server.use(logger);
 
 // Router set up
 const userRouter = require('./users/userRouter');
-server.use('./api/users', userRouter);
+server.use('/api/users', userRouter);
 
 
 server.get('/', (req, res) => {
